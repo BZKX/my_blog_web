@@ -17,16 +17,26 @@ export default {
       offsetOffset: 10,
       maxOffset: 0,
       firstDown: 0,
-      lastX: ''
+      lastX: '',
+      timer: false,
+      screenWidth: document.body.clientWidth
     }
   },
   created() {
     document.addEventListener("mouseup", this.mouseUp);
   },
   mounted() {
+    const that = this
+    window.onresize = () => {
+      return (() => {
+        window.screenWidth = document.body.clientWidth
+        that.screenWidth = window.screenWidth
+      })()
+    }
     // console.log(document.querySelector('#mainBox').offsetWidth);
     this.maxOffset = (document.querySelector('#mainBox').offsetWidth - 400) / 2
     // console.log(this.maxOffset);
+
   },
   methods: {
     mouseDown(event) {
@@ -56,6 +66,24 @@ export default {
     mouseUp() {
       this.lastX = ''
       document.removeEventListener("mousemove", this.mouseMove);
+    }
+  },
+  watch: {
+    screenWidth(val) {
+      // 为了避免频繁触发resize函数导致页面卡顿，使用定时器
+      if (!this.timer) {
+        // 一旦监听到的screenWidth值改变，就将其重新赋给data里的screenWidth
+        this.screenWidth = val
+        this.timer = true
+        let that = this
+        setTimeout(function () {
+          // 打印screenWidth变化的值
+          that.firstDown = 0
+          that.maxOffset = (document.querySelector('#mainBox').offsetWidth - 400) / 2
+          that.$emit('setOffset', 10)
+          that.timer = false
+        }, 400)
+      }
     }
   },
   destroyed() {

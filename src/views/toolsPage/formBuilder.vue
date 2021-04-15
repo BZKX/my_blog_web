@@ -72,7 +72,7 @@
       </a-form-model>
       <a-divider style="font-size: 14px;color:#8c8c8c;">详情配置</a-divider>
       <a-form-model layout="horizontal"
-                    v-show="selectedItem.label"
+                    v-show="selectedItem.selected"
                     style="margin-top: 20px"
                     :model="selectedItem"
                     v-bind="{labelCol: {span: 8},wrapperCol: {span: 16},}"
@@ -128,6 +128,11 @@
                    v-model="selectedItem.suffix"/>
         </a-form-model-item>
       </a-form-model>
+      <div class="bottom-btn-box">
+        <a-button @click="saveAsLocal" style="height: 100%;width: 100%;border-radius:0;" type="primary">
+          保存到缓存
+        </a-button>
+      </div>
     </div>
   </div>
 </template>
@@ -206,6 +211,12 @@ export default {
       selectedItem: {}
     }
   },
+  created() {
+    if (window.localStorage.getItem('myFormJson')) {
+      console.log(JSON.parse(window.localStorage.getItem('myFormJson')));
+      this.formObj = JSON.parse(window.localStorage.getItem('myFormJson'))
+    }
+  },
   mounted() {
     this.myFormWidth = document.querySelector('#myForm').offsetWidth
   },
@@ -235,6 +246,9 @@ export default {
           }
         })
       })
+    },
+    saveAsLocal() {
+      window.localStorage.setItem('myFormJson', JSON.stringify(this.formObj))
     }
   },
 }
@@ -253,6 +267,7 @@ export default {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 0 30px -5px rgba(0,0,0,.5);
 
     .content {
       border-right: 1px solid rgb(235, 237, 240);
@@ -299,14 +314,23 @@ export default {
 
   .setting-box {
     transition: all .4s ease-in-out;
+    position: relative;
     height: 100%;
     min-width: 410px;
-    border-left: 1px solid rgb(235, 237, 240);
     overflow-y: auto;
     box-sizing: border-box;
-    padding: 20px;
+    padding: 20px 20px 80px;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 0 14px -5px rgba(0,0,0,.5);
+
+    .bottom-btn-box {
+      position: absolute;
+      height: 40px;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+    }
   }
 }
 </style>

@@ -24,7 +24,10 @@
                          :class="[item.selected?'col-selected':'','col-box']"
                          :label="item.label"
                          :name="item.modelName">
-              <a-input :placeholder="item.placeholder" v-model="form[item.modelName]"/>
+              <a-input :placeholder="item.placeholder" v-model="form[item.modelName]">
+                <a-icon v-if="item.hasPrefix" slot="prefix" :type="item.prefix" />
+                <a-icon v-if="item.hasSuffix" slot="suffix" :type="item.suffix" />
+              </a-input>
             </a-form-item>
           </a-col>
         </a-row>

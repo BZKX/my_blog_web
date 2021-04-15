@@ -249,6 +249,7 @@ export default {
     },
     saveAsLocal() {
       window.localStorage.setItem('myFormJson', JSON.stringify(this.formObj))
+      this.$message.success('保存成功')
     }
   },
 }
@@ -267,7 +268,7 @@ export default {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 30px -5px rgba(0,0,0,.5);
+    box-shadow: 0 0 30px -5px rgba(0, 0, 0, .5);
 
     .content {
       border-right: 1px solid rgb(235, 237, 240);
@@ -322,7 +323,7 @@ export default {
     padding: 20px 20px 80px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 14px -5px rgba(0,0,0,.5);
+    box-shadow: 0 0 14px -5px rgba(0, 0, 0, .5);
 
     .bottom-btn-box {
       position: absolute;

@@ -4,19 +4,23 @@
       <a-form
           style="width: 100%;height: 100%;"
           :layout="getLayout"
+          id="form"
           :labelAlign="getLayoutAlign"
           :ref="refName"
           :model="form"
           :rules="rules"
           v-bind="formItemLayout"
       >
-        <a-row v-for="formItem in formObj.formItemList" :gutter="formItem.gutter" :key="formItem.rowId">
+        <a-row class="row-box" v-for="formItem in formItemList" :gutter="formItem.gutter" :key="formItem.rowId">
+          <div class="handle-box">
+            <a-icon class="handle" type="menu" />
+          </div>
           <a-col v-for="item in formItem.item"
                  @click="rowClick(item.id)"
-                 :class="[item.selected?'col-selected':'','col-box']"
                  :span="item.span"
                  :key="item.id">
             <a-form-item :ref="item.modelName"
+                         :class="[item.selected?'col-selected':'','col-box']"
                          :label="item.label"
                          :name="item.modelName">
               <a-input :placeholder="item.placeholder" v-model="form[item.modelName]"/>
@@ -41,6 +45,7 @@
 
 <script>
 import {copy} from "../../../until/current";
+import Sortable from 'sortablejs';
 
 export default {
   name: "myForm",
@@ -86,6 +91,7 @@ export default {
       form: this.formObj.form,
       refName: this.formObj.refName,
       rules: this.formObj.rules,
+      formItemList: this.formObj.formItemList,
       dropShow: false,
     }
   },
@@ -117,6 +123,19 @@ export default {
     }
   },
   mounted() {
+    let _this = this
+    //获取对象
+    var el = document.getElementById('form');
+    //初始化
+    Sortable.create(el, {
+      animation: 500,
+      handle: '.handle', // handle's class
+      //拖动结束
+      onEnd: function (evt) {
+        console.log(evt);
+        _this.formItemList.splice(evt.newIndex, 0, _this.formItemList.splice(evt.oldIndex, 1)[0]);
+      },
+    });
   },
   methods: {
     rowClick(id) {
@@ -157,15 +176,39 @@ export default {
 .content {
   height: 100%;
   overflow-y: auto;
-  width: 100%;
+  flex: 1;
   background-color: #fff;
   box-sizing: border-box;
-  padding: 10px;
+  padding: 20px;
+  border-radius: 4px;
   /* 文字不可选中 */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  .row-box{
+    position: relative;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed #8c8c8c;
+
+    .handle-box{
+      position: absolute;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      top: 0;
+      right: -10px;
+      cursor: move;
+      .handle{
+        font-size: 16px;
+        color: #2c3e50;
+        line-height: 20px;
+        margin-top: -10px;
+      }
+    }
+  }
 }
 
 .col-box {
@@ -173,9 +216,9 @@ export default {
 }
 
 .col-selected {
-  cursor: move;
+  //cursor: move;
   //background-color: #f6f5ec;
-  //border: 1px solid #d3d7d4;
+  border: 1px dashed #008792;
 }
 
 </style>

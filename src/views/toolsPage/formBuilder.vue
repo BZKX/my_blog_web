@@ -9,8 +9,15 @@
       <div class="content">
       </div>
     </div>
-    <div class="main-box">
-      <my-form :form-obj="formObj"></my-form>
+    <div class="main-box" id="mainBox" :style="'padding: 34px '+offset+'px 10px'">
+      <a-divider class="width-tip"
+                 :style="{fontSize: '14px',color:'#3e3e3e',width:myFormWidth+'px'}">
+        表单宽度{{
+          myFormWidth
+        }}px
+      </a-divider>
+      <my-form id="myForm" :form-obj="formObj"></my-form>
+      <slider-box @setOffset="setOffset"></slider-box>
     </div>
     <div class="setting-box">
       <a-divider style="font-size: 14px;color:#8c8c8c;">表单全局设置</a-divider>
@@ -68,10 +75,11 @@
 
 <script>
 import MyForm from "./components/myForm.vue";
+import sliderBox from "./components/sliderBox.vue";
 
 export default {
   name: "formBuilder",
-  components: {MyForm},
+  components: {MyForm, sliderBox},
   data() {
     return {
       formObj: {
@@ -125,8 +133,13 @@ export default {
           labelCol: 6,
           wrapperCol: 18,
         }
-      }
+      },
+      offset: 10,
+      myFormWidth: 0,
     }
+  },
+  mounted() {
+    this.myFormWidth = document.querySelector('#myForm').offsetWidth
   },
   methods: {
     goPage(path) {
@@ -134,8 +147,12 @@ export default {
     },
     goHome() {
       this.$router.push('/')
-    }
-  }
+    },
+    setOffset(value) {
+      this.myFormWidth = document.querySelector('#myForm').offsetWidth
+      this.offset = value
+    },
+  },
 }
 </script>
 
@@ -167,8 +184,33 @@ export default {
     flex: 1;
     min-width: 800px;
     box-sizing: border-box;
-    padding: 10px;
+    padding: 10px 0 10px 10px;
     background-color: #e9ebec;
+    display: flex;
+    justify-content: center;
+    position: relative;
+
+    .width-tip {
+      position: absolute;
+      text-align: center;
+      top: 0;
+      left: calc(50% - 4px);
+      transform: translateX(-50%);
+      //width: 100%;
+      min-width: auto;
+      margin-top: 8px;
+      margin-bottom: 0;
+      border-left: 1px dashed #2c3e50;
+      border-right: 1px dashed #2c3e50;
+
+      &:before {
+        border-top: 1px dashed #2c3e50;
+      }
+
+      &:after {
+        border-top: 1px dashed #2c3e50;
+      }
+    }
   }
 
   .setting-box {

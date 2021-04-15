@@ -13,13 +13,14 @@
       >
         <a-row class="row-box" v-for="formItem in formItemList" :gutter="formItem.gutter" :key="formItem.rowId">
           <div class="handle-box">
-            <a-icon class="handle" type="menu" />
+            <a-icon class="handle" type="menu"/>
           </div>
           <a-col v-for="item in formItem.item"
                  @click="rowClick(item.id)"
                  :span="item.span"
                  :key="item.id">
             <a-form-item :ref="item.modelName"
+                         v-if="item.type == 'input'"
                          :class="[item.selected?'col-selected':'','col-box']"
                          :label="item.label"
                          :name="item.modelName">
@@ -70,18 +71,40 @@ export default {
                   span: 12,
                   id: 'input_15451548',
                   label: '输入框1',
+                  placeholder: '请输入1',
                   modelName: 'input_one'
                 },
                 {
                   type: 'input',
                   span: 12,
                   id: 'input_15452548',
+                  placeholder: '请输入姓名',
                   label: '姓名',
                   modelName: 'name'
                 },
               ]
-            }
-          ]
+            },
+            {
+              rowId: 'row_2115485',
+              gutter: 16,
+              item: [
+                {
+                  type: 'input',
+                  span: 12,
+                  id: 'input_15451148',
+                  label: '输入框1',
+                  placeholder: '请输入输入框',
+                  modelName: 'input_one'
+                }
+              ]
+            },
+          ],
+          formLayout: {
+            formLayoutMode: 'grid',
+            layout: 'horizontal_right',
+            labelCol: 6,
+            wrapperCol: 18,
+          }
         }
       }
     }
@@ -139,6 +162,7 @@ export default {
   },
   methods: {
     rowClick(id) {
+      this.$emit('selectedId', id)
       this.formObj.formItemList.forEach(formItem => {
         formItem.selected = false
         formItem.item.forEach(item => {
@@ -187,12 +211,12 @@ export default {
   -ms-user-select: none;
   user-select: none;
 
-  .row-box{
+  .row-box {
     position: relative;
     margin-bottom: 10px;
     border-bottom: 1px dashed #8c8c8c;
 
-    .handle-box{
+    .handle-box {
       position: absolute;
       height: 100%;
       display: flex;
@@ -201,7 +225,8 @@ export default {
       top: 0;
       right: -10px;
       cursor: move;
-      .handle{
+
+      .handle {
         font-size: 16px;
         color: #2c3e50;
         line-height: 20px;

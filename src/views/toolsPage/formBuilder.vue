@@ -16,7 +16,7 @@
           myFormWidth
         }}px
       </a-divider>
-      <my-form id="myForm" :form-obj="formObj"></my-form>
+      <my-form id="myForm" @selectedId="selectedDetail" :form-obj="formObj"></my-form>
       <slider-box @setOffset="setOffset"></slider-box>
     </div>
     <div class="setting-box">
@@ -35,6 +35,7 @@
               <template slot="content">
                 <span>功能开发中</span>
               </template>
+              <!-- TODO 流体布局 -->
               <a-radio-button disabled value="flex">
                 流体布局
               </a-radio-button>
@@ -69,6 +70,64 @@
                           :max="24"/>
         </a-form-model-item>
       </a-form-model>
+      <a-divider style="font-size: 14px;color:#8c8c8c;">详情配置</a-divider>
+      <a-form-model layout="horizontal"
+                    v-show="selectedItem.label"
+                    style="margin-top: 20px"
+                    :model="selectedItem"
+                    v-bind="{labelCol: {span: 8},wrapperCol: {span: 16},}"
+      >
+        <a-form-model-item label="Label:">
+          <a-input placeholder="请输入Label"
+                   v-model="selectedItem.label"/>
+        </a-form-model-item>
+        <a-form-model-item label="占位符:">
+          <a-input placeholder="请输入占位内容"
+                   v-model="selectedItem.placeholder"/>
+        </a-form-model-item>
+        <a-form-model-item label="图标前缀:">
+          <a-tooltip title="使用方法: 将图标名复制到前缀输入框">
+            <a-switch v-model="selectedItem.hasPrefix"/>
+          </a-tooltip>
+          <a-button @click="showIconWeb" type="link">
+            官方图标
+          </a-button>
+          <a-popover placement="top">
+            <template slot="content">
+              <span>功能开发中</span>
+            </template>
+            <!-- TODO 自定义图标功能 -->
+            <a-button disabled type="link">
+              自定义图标
+            </a-button>
+          </a-popover>
+        </a-form-model-item>
+        <a-form-model-item v-if="selectedItem.hasPrefix" label="前缀图标名:">
+          <a-input placeholder="请输入图标名"
+                   v-model="selectedItem.prefix"/>
+        </a-form-model-item>
+        <a-form-model-item label="图标后缀:">
+          <a-tooltip title="使用方法: 将图标名复制到前缀输入框">
+            <a-switch v-model="selectedItem.hasSuffix"/>
+          </a-tooltip>
+          <a-button @click="showIconWeb" type="link">
+            官方图标
+          </a-button>
+          <a-popover placement="top">
+            <template slot="content">
+              <span>功能开发中</span>
+            </template>
+            <!-- TODO 自定义图标功能 -->
+            <a-button disabled type="link">
+              自定义图标
+            </a-button>
+          </a-popover>
+        </a-form-model-item>
+        <a-form-model-item v-if="selectedItem.hasSuffix" label="前缀图标名:">
+          <a-input placeholder="请输入图标名"
+                   v-model="selectedItem.suffix"/>
+        </a-form-model-item>
+      </a-form-model>
     </div>
   </div>
 </template>
@@ -100,7 +159,11 @@ export default {
                 id: 'input_15451548',
                 label: '输入框1',
                 placeholder: '请输入1',
-                modelName: 'input_one'
+                modelName: 'input_one',
+                hasPrefix: false,
+                prefix: '',
+                hasSuffix: false,
+                suffix: '',
               },
               {
                 type: 'input',
@@ -108,7 +171,9 @@ export default {
                 id: 'input_15452548',
                 placeholder: '请输入姓名',
                 label: '姓名',
-                modelName: 'name'
+                modelName: 'name',
+                hasPrefix: false,
+                hasSuffix: false,
               },
             ]
           },
@@ -122,7 +187,9 @@ export default {
                 id: 'input_15451148',
                 label: '输入框1',
                 placeholder: '请输入输入框',
-                modelName: 'input_one'
+                modelName: 'input_one',
+                hasPrefix: false,
+                hasSuffix: false,
               }
             ]
           },
@@ -136,6 +203,7 @@ export default {
       },
       offset: 10,
       myFormWidth: 0,
+      selectedItem: {}
     }
   },
   mounted() {
@@ -152,6 +220,22 @@ export default {
       this.myFormWidth = document.querySelector('#myForm').offsetWidth
       this.offset = value
     },
+    // 跳转到ant_vue页面
+    showIconWeb() {
+      window.open('https://1x.antdv.com/components/icon-cn/')
+    },
+    selectedDetail(id) {
+      console.log(this.formObj);
+      console.log(id);
+      this.formObj.formItemList.forEach(formItem => {
+        formItem.selected = false
+        formItem.item.forEach(item => {
+          if (item.id == id) {
+            this.selectedItem = item
+          }
+        })
+      })
+    }
   },
 }
 </script>
@@ -216,7 +300,7 @@ export default {
   .setting-box {
     transition: all .4s ease-in-out;
     height: 100%;
-    min-width: 320px;
+    min-width: 410px;
     border-left: 1px solid rgb(235, 237, 240);
     overflow-y: auto;
     box-sizing: border-box;

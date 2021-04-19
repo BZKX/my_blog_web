@@ -65,6 +65,22 @@
       <div class="item-box"
            v-show="selectedRow.selected">
         <a-divider style="font-size: 14px;color:#8c8c8c;">栅格编辑</a-divider>
+        <a-form-model layout="horizontal"
+                      style="margin-top: 20px"
+                      :model="selectedRow"
+                      v-bind="{labelCol: {span: 8},wrapperCol: {span: 16},}"
+        >
+          <a-form-model-item label="Key:">
+            {{ selectedRow.rowId }}
+          </a-form-model-item>
+          <a-form-model-item v-for="item in selectedRow.item" :key="item.id" :label="`${item.label}权重:`">
+            <a-input-number placeholder="labelCol"
+                            v-model="item.span"
+                            :precision="0"
+                            :min="1"
+                            :max="24"/>
+          </a-form-model-item>
+        </a-form-model>
       </div>
       <div class="item-box"
            v-show="selectedItem.selected">

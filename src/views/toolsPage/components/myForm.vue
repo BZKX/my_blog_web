@@ -41,6 +41,7 @@
               <draggable style="width: 100%;display: flex"
                          v-model="formItem.item"
                          group="item"
+                         handle=".ant-form-item-label"
                          animation="500">
                 <div v-for="item in formItem.item"
                      class="my-col"
@@ -325,10 +326,10 @@ export default {
 }
 
 ::v-deep .ant-form-item-label {
-  cursor: pointer;
+  cursor: move;
 
   > label {
-    cursor: pointer;
+    cursor: move;
   }
 }
 

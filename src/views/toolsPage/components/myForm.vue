@@ -349,9 +349,15 @@ export default {
     formItemList: {
       deep: true,
       handler(newVal) {
-        if (newVal[newVal.length - 1].item && newVal[newVal.length - 1].item.length) {
+        if (newVal[newVal.length - 1].item && newVal[newVal.length - 1].item.length && newVal[newVal.length - 1].rowId == "row_last") {
           this.$emit('updateNewRow')
         }
+      }
+    },
+    formObj: {
+      deep: true,
+      handler() {
+        this.formItemList = this.formObj.formItemList
       }
     }
   }

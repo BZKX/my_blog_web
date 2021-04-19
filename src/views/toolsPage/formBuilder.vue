@@ -383,7 +383,6 @@ export default {
     },
     // 更新新的一列
     updateNewRow() {
-      console.log(123);
       this.formObj.formItemList[this.formObj.formItemList.length - 1].rowId = `row_${Date.parse(new Date())}`
       this.formObj.formItemList.push({
         rowId: 'row_last',

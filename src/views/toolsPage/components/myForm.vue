@@ -13,12 +13,15 @@
         >
           <draggable v-model="formItemList"
                      animation="500"
+                     filter="#row_last"
+                     :move="lastRowMove"
                      handle=".handle">
             <a-row :class="['row-box',formItem.selected?'row-selected':'']"
-                   v-for="formItem in formItemList"
+                   v-for="(formItem,index) in formItemList"
                    :gutter="formItem.gutter"
+                   :id="formItem.rowId"
                    :key="formItem.rowId">
-              <div class="handle-box">
+              <div v-if="index!=formItemList.length-1" class="handle-box">
                 <a-popover placement="left">
                   <template slot="content">
                     <span>拖动列</span>
@@ -35,8 +38,11 @@
                   <template slot="content">
                     <span>删除列</span>
                   </template>
-                  <a-icon class="icon del" type="delete"/>
+                  <a-icon @click="delRow(index)" class="icon del" type="delete"/>
                 </a-popover>
+              </div>
+              <div class="tip-add" v-if="index==formItemList.length-1">
+                <p>拖动到此处添加新的行</p>
               </div>
               <draggable style="width: 100%;display: flex"
                          v-model="formItem.item"
@@ -271,13 +277,15 @@ export default {
       this.$emit('selectedId', id)
       this.formObj.formItemList.forEach(formItem => {
         formItem.selected = false
-        formItem.item.forEach(item => {
-          if (item.id == id) {
-            item.selected = true
-          } else {
-            item.selected = false
-          }
-        })
+        if (formItem.item) {
+          formItem.item.forEach(item => {
+            if (item.id == id) {
+              item.selected = true
+            } else {
+              item.selected = false
+            }
+          })
+        }
       })
       this.$forceUpdate()
     },
@@ -289,16 +297,32 @@ export default {
         } else {
           formItem.selected = false
         }
-        formItem.item.forEach(item => {
-          item.selected = false
-        })
+        if (formItem.item) {
+          formItem.item.forEach(item => {
+            item.selected = false
+          })
+        }
       })
       this.$forceUpdate()
     },
+    // 删除行
+    delRow(index) {
+      let _this = this
+      this.$confirm({
+        title: '是否删除改行表单数据',
+        okText: '确认',
+        cancelText: '取消',
+        onOk() {
+          _this.$emit('delRow', index)
+        }
+      });
+    },
     // 复制JSON
     copyJSON() {
+      let postForm = JSON.parse(JSON.stringify(this.formObj))
+      postForm.formItemList.pop()
+      copy(JSON.stringify(postForm))
       this.dropShow = false
-      copy(JSON.stringify(this.formObj))
     },
     // 下载组件
     downCode() {
@@ -313,8 +337,22 @@ export default {
     mouseclick() {
       this.dropShow = true
     },
-    save(){
-      this.$emit('updateFormList',this.formItemList)
+    save() {
+      this.$emit('updateFormList', this.formItemList)
+    },
+    lastRowMove(e) {
+      if (e.related.id == 'row_last') return false;
+      return true;
+    },
+  },
+  watch: {
+    formItemList: {
+      deep: true,
+      handler(newVal) {
+        if (newVal[newVal.length - 1].item && newVal[newVal.length - 1].item.length) {
+          this.$emit('updateNewRow')
+        }
+      }
     }
   }
 }
@@ -432,5 +470,29 @@ export default {
   0 0 0 2px #ffffff,
   0 0 3px 2px rgba(42, 42, 42, 0.6);
 }
+
+#row_last {
+  background-image: none;
+  border-left: #8c8c8c dashed 1px;
+  border-right: #8c8c8c dashed 1px;
+  background-color: rgba(227, 249, 253, 0.5) !important;
+  transition: background-color .4s ease-in-out;
+
+  &:hover {
+    background-color: rgba(227, 249, 253, 0.8) !important;
+  }
+
+  .tip-add {
+    position: absolute;
+    line-height: 45px;
+    width: 100%;
+
+    p {
+      text-align: center;
+      color: #8c8c8c;
+    }
+  }
+}
+
 
 </style>

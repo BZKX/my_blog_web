@@ -18,8 +18,10 @@
       </a-divider>
       <my-form id="myForm" ref="myForm"
                @updateFormList="updateFormList"
+               @delRow="delRow"
                @selectRow="selectedRowId"
                @selectedId="selectedDetail"
+               @updateNewRow="updateNewRow"
                :form-obj="formObj"></my-form>
       <slider-box @setOffset="setOffset"></slider-box>
     </div>
@@ -106,6 +108,7 @@
                             :min="1"
                             :max="24"/>
           </a-form-model-item>
+          <tips tips="注: labelCol与wrapperCol的和最大为24"></tips>
           <a-form-model-item label="标签:">
             <a-input placeholder="请输入标签名"
                      v-model="selectedItem.label"/>
@@ -195,10 +198,11 @@
 <script>
 import MyForm from "./components/myForm.vue";
 import sliderBox from "./components/sliderBox.vue";
+import Tips from "./components/tips";
 
 export default {
   name: "formBuilder",
-  components: {MyForm, sliderBox},
+  components: {Tips, MyForm, sliderBox},
   data() {
     return {
       formObj: {
@@ -283,6 +287,11 @@ export default {
               // }
             ]
           },
+          {
+            rowId: 'row_last',
+            gutter: 16,
+            item: []
+          }
         ],
         formLayout: {
           formLayoutMode: 'grid',
@@ -334,6 +343,11 @@ export default {
     if (window.localStorage.getItem('myFormJson')) {
       console.log(JSON.parse(window.localStorage.getItem('myFormJson')));
       this.formObj = JSON.parse(window.localStorage.getItem('myFormJson'))
+      this.formObj.formItemList.push({
+        rowId: 'row_last',
+        gutter: 16,
+        item: []
+      })
     }
   },
   mounted() {
@@ -358,11 +372,23 @@ export default {
     selectedDetail(id) {
       this.formObj.formItemList.forEach(formItem => {
         formItem.selected = false
-        formItem.item.forEach(item => {
-          if (item.id == id) {
-            this.selectedItem = item
-          }
-        })
+        if (formItem.item) {
+          formItem.item.forEach(item => {
+            if (item.id == id) {
+              this.selectedItem = item
+            }
+          })
+        }
+      })
+    },
+    // 更新新的一列
+    updateNewRow() {
+      console.log(123);
+      this.formObj.formItemList[this.formObj.formItemList.length - 1].rowId = `row_${Date.parse(new Date())}`
+      this.formObj.formItemList.push({
+        rowId: 'row_last',
+        gutter: 16,
+        item: []
       })
     },
     // 栅格行选中
@@ -372,6 +398,10 @@ export default {
           this.selectedRow = formItem
         }
       })
+    },
+    // 删除行
+    delRow(index) {
+      this.formObj.formItemList.splice(index, 1)
     },
     // 必填选中
     requiredChange(e, item) {
@@ -393,11 +423,15 @@ export default {
       this.formObj.formItemList = formList
       this.formObj.formItemList.forEach(formItem => {
         formItem.selected = false
-        formItem.item.forEach(item => {
-          item.selected = false
-        })
+        if (formItem.item) {
+          formItem.item.forEach(item => {
+            item.selected = false
+          })
+        }
       })
-      window.localStorage.setItem('myFormJson', JSON.stringify(this.formObj))
+      let postForm = JSON.parse(JSON.stringify(this.formObj))
+      postForm.formItemList.pop()
+      window.localStorage.setItem('myFormJson', JSON.stringify(postForm))
       this.$message.success('保存成功')
     },
     TypeChange(e, item) {

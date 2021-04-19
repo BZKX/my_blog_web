@@ -16,7 +16,10 @@
           myFormWidth
         }}px
       </a-divider>
-      <my-form id="myForm" ref="myForm" @selectRow="selectedRowId" @selectedId="selectedDetail"
+      <my-form id="myForm" ref="myForm"
+               @updateFormList="updateFormList"
+               @selectRow="selectedRowId"
+               @selectedId="selectedDetail"
                :form-obj="formObj"></my-form>
       <slider-box @setOffset="setOffset"></slider-box>
     </div>
@@ -57,22 +60,6 @@
               </a-radio-button>
             </a-radio-group>
           </a-form-model-item>
-          <a-form-model-item v-show="formObj.formLayout.layout !== 'vertical'" label="labelCol:">
-            <a-input-number placeholder="labelCol"
-                            id="labelCol"
-                            v-model="formObj.formLayout.labelCol"
-                            :precision="0"
-                            :min="1"
-                            :max="24"/>
-          </a-form-model-item>
-          <a-form-model-item v-show="formObj.formLayout.layout !== 'vertical'" label="wrapperCol:">
-            <a-input-number placeholder="labelCol"
-                            id="wrapperCol"
-                            v-model="formObj.formLayout.wrapperCol"
-                            :precision="0"
-                            :min="1"
-                            :max="24"/>
-          </a-form-model-item>
         </a-form-model>
       </div>
       <div class="item-box"
@@ -87,6 +74,22 @@
                       :model="selectedItem"
                       v-bind="{labelCol: {span: 8},wrapperCol: {span: 16},}"
         >
+          <a-form-model-item v-if="formObj.formLayout.layout !== 'vertical'&&selectedItem.bind" label="labelCol:">
+            <a-input-number placeholder="labelCol"
+                            id="labelCol"
+                            v-model="selectedItem.bind.labelCol"
+                            :precision="0"
+                            :min="1"
+                            :max="24"/>
+          </a-form-model-item>
+          <a-form-model-item v-if="formObj.formLayout.layout !== 'vertical'&&selectedItem.bind" label="wrapperCol:">
+            <a-input-number placeholder="labelCol"
+                            id="wrapperCol"
+                            v-model="selectedItem.bind.wrapperCol"
+                            :precision="0"
+                            :min="1"
+                            :max="24"/>
+          </a-form-model-item>
           <a-form-model-item label="标签:">
             <a-input placeholder="请输入标签名"
                      v-model="selectedItem.label"/>
@@ -211,6 +214,10 @@ export default {
                 prefix: '',
                 hasSuffix: false,
                 suffix: '',
+                bind: {
+                  labelCol: 6,
+                  wrapperCol: 18,
+                }
               },
               {
                 type: 'input',
@@ -225,6 +232,10 @@ export default {
                 },  //自定义规则
                 hasPrefix: false,
                 hasSuffix: false,
+                bind: {
+                  labelCol: 6,
+                  wrapperCol: 18,
+                }
               },
             ]
           },
@@ -245,11 +256,15 @@ export default {
                 },  //自定义规则
                 hasPrefix: false,
                 hasSuffix: false,
+                bind: {
+                  labelCol: 6,
+                  wrapperCol: 18,
+                }
               },
-              {
-                span: 12,
-                id: 'col_15451118',
-              }
+              // {
+              //   span: 12,
+              //   id: 'col_15451118',
+              // }
             ]
           },
         ],
@@ -356,6 +371,10 @@ export default {
       this.$refs.myForm.repaint()
     },
     saveAsLocal() {
+      this.$refs.myForm.save()
+    },
+    updateFormList(formList) {
+      this.formObj.formItemList = formList
       this.formObj.formItemList.forEach(formItem => {
         formItem.selected = false
         formItem.item.forEach(item => {

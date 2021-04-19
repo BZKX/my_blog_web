@@ -7555,6 +7555,11 @@ sort-keys@^1.0.0:
   dependencies:
     is-plain-obj "^1.0.0"
 
+sortablejs@1.10.2:
+  version "1.10.2"
+  resolved "https://registry.npm.taobao.org/sortablejs/download/sortablejs-1.10.2.tgz?cache=0&sync_timestamp=1610070448468&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fsortablejs%2Fdownload%2Fsortablejs-1.10.2.tgz#6e40364d913f98b85a14f6678f92b5c1221f5290"
+  integrity sha1-bkA2TZE/mLhaFPZnj5K1wSIfUpA=
+
 sortablejs@^1.13.0:
   version "1.13.0"
   resolved "https://registry.npm.taobao.org/sortablejs/download/sortablejs-1.13.0.tgz?cache=0&sync_timestamp=1610070448468&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fsortablejs%2Fdownload%2Fsortablejs-1.13.0.tgz#3ab2473f8c69ca63569e80b1cd1b5669b51269e9"
@@ -8480,6 +8485,13 @@ vue@^2.6.11:
   version "2.6.12"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.12.tgz#f5ebd4fa6bd2869403e29a896aed4904456c9123"
   integrity sha512-uhmLFETqPPNyuLLbsKz6ioJ4q7AZHzD8ZVFNATNyICSZouqP2Sz0rotWQC8UNBF6VGSCs5abnKJoStA6JbCbfg==
+
+vuedraggable@^2.24.3:
+  version "2.24.3"
+  resolved "https://registry.npm.taobao.org/vuedraggable/download/vuedraggable-2.24.3.tgz#43c93849b746a24ce503e123d5b259c701ba0d19"
+  integrity sha1-Q8k4SbdGokzlA+Ej1bJZxwG6DRk=
+  dependencies:
+    sortablejs "1.10.2"
 
 vuex@^3.4.0:
   version "3.6.2"

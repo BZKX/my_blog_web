@@ -10,81 +10,93 @@
             :ref="refName"
             :model="form"
             :rules="formObj.rules"
-            v-bind="formItemLayout"
         >
-          <a-row :class="['row-box',formItem.selected?'row-selected':'']"
-                 v-for="formItem in formItemList"
-                 :gutter="formItem.gutter"
-                 :key="formItem.rowId">
-            <div class="handle-box">
-              <a-popover placement="left">
-                <template slot="content">
-                  <span>拖动列</span>
-                </template>
-                <a-icon class="handle" type="drag"/>
-              </a-popover>
-              <a-popover placement="left">
-                <template slot="content">
-                  <span>编辑列</span>
-                </template>
-                <a-icon @click="selectRow(formItem.rowId)" class="icon edit" type="edit"/>
-              </a-popover>
-              <a-popover placement="left">
-                <template slot="content">
-                  <span>删除列</span>
-                </template>
-                <a-icon class="icon del" type="delete"/>
-              </a-popover>
-            </div>
-            <a-col v-for="item in formItem.item"
-                   @click="rowClick(item.id)"
-                   :span="item.span"
-                   :key="item.id">
-              <!-- Input -- trim -->
-              <a-form-model-item :ref="item.modelName"
-                                 v-if="item.type == 'input'&&formObj.formTrim"
-                                 :class="[item.selected?'col-selected':'','col-box']"
-                                 :label="item.label"
-                                 :prop="item.modelName"
-                                 :name="item.modelName">
-                <a-input v-if="item.valueType == 'number'"
-                         :placeholder="item.placeholder"
-                         :allow-clear="item.allowClear"
-                         v-model.trim.number="form[item.modelName]">
-                  <a-icon v-if="item.hasPrefix" slot="prefix" :type="item.prefix"/>
-                  <a-icon v-if="item.hasSuffix" slot="suffix" :type="item.suffix"/>
-                </a-input>
-                <a-input v-else :placeholder="item.placeholder"
-                         :allow-clear="item.allowClear"
-                         v-model.trim="form[item.modelName]">
-                  <a-icon v-if="item.hasPrefix" slot="prefix" :type="item.prefix"/>
-                  <a-icon v-if="item.hasSuffix" slot="suffix" :type="item.suffix"/>
-                </a-input>
-              </a-form-model-item>
-              <!-- Input -- no trim -->
-              <a-form-model-item :ref="item.modelName"
-                                 v-else-if="item.type == 'input'"
-                                 :class="[item.selected?'col-selected':'','col-box']"
-                                 :label="item.label"
-                                 :prop="item.modelName"
-                                 :name="item.modelName">
-                <a-input v-if="item.valueType == 'number'"
-                         :placeholder="item.placeholder"
-                         :allow-clear="item.allowClear"
-                         v-model.number="form[item.modelName]">
-                  <a-icon v-if="item.hasPrefix" slot="prefix" :type="item.prefix"/>
-                  <a-icon v-if="item.hasSuffix" slot="suffix" :type="item.suffix"/>
-                </a-input>
-                <a-input v-else :placeholder="item.placeholder"
-                         :allow-clear="item.allowClear"
-                         v-model="form[item.modelName]">
-                  <a-icon v-if="item.hasPrefix" slot="prefix" :type="item.prefix"/>
-                  <a-icon v-if="item.hasSuffix" slot="suffix" :type="item.suffix"/>
-                </a-input>
-              </a-form-model-item>
-            </a-col>
-          </a-row>
-
+          <draggable v-model="formItemList"
+                     animation="500"
+                     handle=".handle">
+            <a-row :class="['row-box',formItem.selected?'row-selected':'']"
+                   v-for="formItem in formItemList"
+                   :gutter="formItem.gutter"
+                   :key="formItem.rowId">
+              <div class="handle-box">
+                <a-popover placement="left">
+                  <template slot="content">
+                    <span>拖动列</span>
+                  </template>
+                  <a-icon class="handle" type="drag"/>
+                </a-popover>
+                <a-popover placement="left">
+                  <template slot="content">
+                    <span>编辑列</span>
+                  </template>
+                  <a-icon @click="selectRow(formItem.rowId)" class="icon edit" type="edit"/>
+                </a-popover>
+                <a-popover placement="left">
+                  <template slot="content">
+                    <span>删除列</span>
+                  </template>
+                  <a-icon class="icon del" type="delete"/>
+                </a-popover>
+              </div>
+              <draggable style="width: 100%;display: flex"
+                         v-model="formItem.item"
+                         group="item"
+                         animation="500">
+                <div v-for="item in formItem.item"
+                     class="my-col"
+                     @click="rowClick(item.id)"
+                     :style="{flex:item.span}"
+                     :key="item.id">
+                  <!-- Input -- trim -->
+                  <a-form-model-item :ref="item.modelName"
+                                     v-if="item.type == 'input'&&formObj.formTrim"
+                                     :class="[item.selected?'col-selected':'','col-box']"
+                                     :label="item.label"
+                                     :prop="item.modelName"
+                                     v-bind="{
+                                               labelCol: {span: item.bind.labelCol},
+                                               wrapperCol: {span: item.bind.wrapperCol},
+                                             }"
+                                     :name="item.modelName">
+                    <a-input v-if="item.valueType == 'number'"
+                             :placeholder="item.placeholder"
+                             :allow-clear="item.allowClear"
+                             v-model.trim.number="form[item.modelName]">
+                      <a-icon v-if="item.hasPrefix" slot="prefix" :type="item.prefix"/>
+                      <a-icon v-if="item.hasSuffix" slot="suffix" :type="item.suffix"/>
+                    </a-input>
+                    <a-input v-else :placeholder="item.placeholder"
+                             :allow-clear="item.allowClear"
+                             v-model.trim="form[item.modelName]">
+                      <a-icon v-if="item.hasPrefix" slot="prefix" :type="item.prefix"/>
+                      <a-icon v-if="item.hasSuffix" slot="suffix" :type="item.suffix"/>
+                    </a-input>
+                  </a-form-model-item>
+                  <!-- Input -- no trim -->
+                  <a-form-model-item :ref="item.modelName"
+                                     v-else-if="item.type == 'input'"
+                                     :class="[item.selected?'col-selected':'','col-box']"
+                                     :label="item.label"
+                                     :prop="item.modelName"
+                                     :name="item.modelName">
+                    <a-input v-if="item.valueType == 'number'"
+                             :placeholder="item.placeholder"
+                             :allow-clear="item.allowClear"
+                             v-model.number="form[item.modelName]">
+                      <a-icon v-if="item.hasPrefix" slot="prefix" :type="item.prefix"/>
+                      <a-icon v-if="item.hasSuffix" slot="suffix" :type="item.suffix"/>
+                    </a-input>
+                    <a-input v-else :placeholder="item.placeholder"
+                             :allow-clear="item.allowClear"
+                             v-model="form[item.modelName]">
+                      <a-icon v-if="item.hasPrefix" slot="prefix" :type="item.prefix"/>
+                      <a-icon v-if="item.hasSuffix" slot="suffix" :type="item.suffix"/>
+                    </a-input>
+                  </a-form-model-item>
+                </div>
+              </draggable>
+            </a-row>
+          </draggable>
         </a-form-model>
       </a-spin>
     </div>
@@ -104,10 +116,12 @@
 
 <script>
 import {copy} from "../../../until/current";
-import Sortable from 'sortablejs';
+// import Sortable from 'sortablejs';
+import draggable from 'vuedraggable'
 
 export default {
   name: "myForm",
+  components: {draggable},
   props: {
     formObj: {
       type: Object,
@@ -210,18 +224,38 @@ export default {
     }
   },
   mounted() {
-    let _this = this
-    //获取对象
-    var el = document.getElementById('form');
-    //初始化
-    Sortable.create(el, {
-      animation: 500,
-      handle: '.handle', // handle's class
-      //拖动结束
-      onEnd: function (evt) {
-        _this.formItemList.splice(evt.newIndex, 0, _this.formItemList.splice(evt.oldIndex, 1)[0]);
-      },
-    });
+    // let _this = this
+    // 行拖动
+    // 获取对象
+    // var el = document.getElementById('form');
+    // console.log(el);
+    // // 初始化
+    // Sortable.create(el, {
+    //   animation: 500,
+    //   fallbackOnBody: true,
+    //   handle: '.handle', // handle's class
+    //   //拖动结束
+    //   onEnd: function (evt) {
+    //     console.log(evt.newIndex);
+    //     _this.formItemList.splice(evt.newIndex, 0, _this.formItemList.splice(evt.oldIndex, 1)[0]);
+    //   },
+    // });
+
+    // var colList = document.querySelectorAll('.row-box');
+    // colList.forEach((col, index) => {
+    //   Sortable.create(col, {
+    //     fallbackOnBody: true,
+    //     animation: 500,
+    //     //拖动结束
+    //     onEnd: function (evt) {
+    //       _this.formItemList[index].item.splice(evt.newIndex, 0, _this.formItemList[index].item.splice(evt.oldIndex, 1)[0]);
+    //       console.log(index);
+    //       console.log(evt.newIndex);
+    //       console.log(_this.formItemList[index].item);
+    //       // _this.formItemList.splice(evt.newIndex, 0, _this.formItemList.splice(evt.oldIndex, 1)[0]);
+    //     },
+    //   });
+    // })
   },
   methods: {
     repaint() {
@@ -277,6 +311,9 @@ export default {
     },
     mouseclick() {
       this.dropShow = true
+    },
+    save(){
+      this.$emit('updateFormList',this.formItemList)
     }
   }
 }
@@ -311,6 +348,7 @@ export default {
   user-select: none;
 
   .row-box {
+    min-height: 85px;
     position: relative;
     //margin-bottom: 20px;
     padding-top: 20px;
@@ -320,6 +358,15 @@ export default {
     background-image: linear-gradient(to right, #e3f9fd, #ffffff, #ffffff);
     background-position: 100% 0;
     background-size: 200%;
+    display: flex;
+    flex-direction: row;
+
+    .my-col {
+      flex: 1;
+      box-sizing: border-box;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
 
     .handle-box {
       position: absolute;

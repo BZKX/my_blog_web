@@ -59,6 +59,7 @@
                                      v-if="item.type == 'input'&&formObj.formTrim"
                                      :class="[item.selected?'col-selected':'','col-box']"
                                      :label="item.label"
+                                     :key="item.id"
                                      :prop="item.modelName"
                                      v-bind="{
                                                labelCol: {span: item.bind.labelCol},
@@ -84,6 +85,7 @@
                                      v-else-if="item.type == 'input'"
                                      :class="[item.selected?'col-selected':'','col-box']"
                                      :label="item.label"
+                                     :id="item.id"
                                      :prop="item.modelName"
                                      :name="item.modelName">
                     <a-input v-if="item.valueType == 'number'"
@@ -100,6 +102,26 @@
                       <a-icon v-if="item.hasSuffix" slot="suffix" :type="item.suffix"/>
                     </a-input>
                   </a-form-model-item>
+                  <!-- inputNumber -->
+                  <a-form-model-item :ref="item.modelName"
+                                     v-if="item.type == 'inputNumber'&&formObj.formTrim"
+                                     :class="[item.selected?'col-selected':'','col-box']"
+                                     :id="item.id"
+                                     :label="item.label"
+                                     :prop="item.modelName"
+                                     v-bind="{
+                                               labelCol: {span: item.bind.labelCol},
+                                               wrapperCol: {span: item.bind.wrapperCol},
+                                             }"
+                                     :name="item.modelName">
+                    <a-input-number id="inputNumber"
+                                    style="width: 100%;"
+                                    :placeholder="item.placeholder"
+                                    v-model="form[item.modelName]"
+                                    :min="item.mini === undefined?-Infinity:item.mini"
+                                    :max="item.max === undefined?Infinity:item.max"/>
+                  </a-form-model-item>
+
                 </div>
               </draggable>
             </a-row>
@@ -268,6 +290,19 @@ export default {
     repaint() {
       this.repaintLoading = true
       this.formItemList = []
+      new Promise(resolve => {
+        // this.formObj.formItemList.forEach(formItem => {
+        //   formItem.selected = false
+        //   if (formItem.item) {
+        //     formItem.item.forEach(item => {
+        //       item.selected = false
+        //     })
+        //   }
+        // })
+        resolve()
+      }).then(() => {
+        this.formItemList = []
+      })
       setTimeout(() => {
         this.formItemList = this.formObj.formItemList
         this.repaintLoading = false
@@ -334,7 +369,11 @@ export default {
     closeMenu() {
       this.dropShow = false
     },
-    mouseclick() {
+    mouseclick(e) {
+      console.log(e);
+      if (e.target.tagName == 'LABEL'){
+        console.log(123);
+      }
       this.dropShow = true
     },
     save() {
@@ -349,7 +388,7 @@ export default {
     formItemList: {
       deep: true,
       handler(newVal) {
-        if (newVal[newVal.length - 1].item && newVal[newVal.length - 1].item.length && newVal[newVal.length - 1].rowId == "row_last") {
+        if (newVal.length && newVal[newVal.length - 1].item && newVal[newVal.length - 1].item.length && newVal[newVal.length - 1].rowId == "row_last") {
           this.$emit('updateNewRow')
         }
       }

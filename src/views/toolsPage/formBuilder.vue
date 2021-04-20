@@ -7,6 +7,17 @@
           @back="goHome"
       />
       <div class="content">
+        <p style="text-align: center;font-size: 12px">点击添加新的组件，选中行后可添加到指定行</p>
+        <a-divider style="font-size: 14px;color:#8c8c8c;">输入框组件</a-divider>
+        <div class="component-list">
+          <a-button v-for="item in formComponent.inputList"
+                    :key="item.type"
+                    @click="addNewComponent(item.type)"
+                    class="move-btn">{{
+              item.label
+            }}
+          </a-button>
+        </div>
       </div>
     </div>
     <div class="main-box" id="mainBox" :style="'padding: 34px '+offset+'px 10px'">
@@ -336,7 +347,13 @@ export default {
           value: 'float',
           message: '',
         }
-      ]
+      ],
+      formComponent: {
+        inputList: [
+          {label: '普通输入框', type: 'input'},
+          {label: '数字输入框', type: 'inputNumber'},
+        ]
+      }
     }
   },
   created() {
@@ -405,13 +422,29 @@ export default {
     // 必填选中
     requiredChange(e, item) {
       if (e) { // 必填
-        this.formObj.rules[item.modelName] = [{
-          required: true,
-          message: `请输入${item.label}`,
-          trigger: item.type == 'input' ? 'blur' : 'change'
-        }]
+        if (this.formObj.rules[item.modelName]) {
+          this.formObj.rules[item.modelName].unshift({
+            required: true,
+            message: `请输入${item.label}`,
+            trigger: item.type == 'input' ? 'blur' : 'change'
+          })
+        } else {
+          this.formObj.rules[item.modelName] = [{
+            required: true,
+            message: `请输入${item.label}`,
+            trigger: item.type == 'input' ? 'blur' : 'change'
+          }]
+        }
       } else if (this.formObj.rules[item.modelName] !== undefined) { // 非必填
-        delete this.formObj.rules[item.modelName]
+        let newRulesList = []
+        if (this.formObj.rules[item.modelName]) {
+          this.formObj.rules[item.modelName].forEach(val => {
+            if (!val.required || !val.validator) {
+              newRulesList.push(val)
+            }
+          })
+        }
+        this.formObj.rules[item.modelName] = newRulesList
       }
       this.$refs.myForm.repaint()
     },
@@ -454,6 +487,41 @@ export default {
       this.formObj.rules[item.modelName] = newRulesList
       this.$refs.myForm.repaint()
 
+    },
+    // 添加组件
+    addNewComponent(type) {
+      let timestamp = Date.parse(new Date())
+      let addObj = {
+        type: type,
+        span: 24,
+        placeholder: `请输入`,
+        id: `col_${timestamp}`,
+        label: `item_${timestamp}`,
+        modelName: `type_${timestamp}`,
+        allowClear: false,
+        bind: {
+          labelCol: 6,
+          wrapperCol: 18,
+        }
+      }
+      // input标签
+      if (type == 'input') {
+        addObj.hasPrefix = false;
+        addObj.hasSuffix = false;
+        addObj.customRules = {
+          normalType: undefined,
+        }
+      } else if (type == 'inputNumber') { // 数字输入框
+        addObj.min = -Infinity
+        addObj.max = Infinity
+      }
+      this.formObj.form[`type_${timestamp}`] = ''
+      if (this.selectedRow.selected) {
+        this.selectedRow.item.push(addObj)
+      } else {
+        this.formObj.formItemList[this.formObj.formItemList.length - 1].item.push(addObj)
+        this.updateNewRow()
+      }
     }
   },
 }
@@ -468,7 +536,7 @@ export default {
 
   .left-box {
     height: 100%;
-    min-width: 300px;
+    width: 300px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -481,6 +549,24 @@ export default {
       padding: 20px 10px;
       flex: 1;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+
+      .component-list {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+        padding: 20px 10px;
+
+        .move-btn {
+          width: 110px;
+
+          &:nth-of-type(Odd) {
+            margin-right: 20px;
+          }
+        }
+      }
     }
   }
 
